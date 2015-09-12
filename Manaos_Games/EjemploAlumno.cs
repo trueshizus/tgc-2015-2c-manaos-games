@@ -7,6 +7,7 @@ using Microsoft.DirectX.Direct3D;
 using System.Drawing;
 using Microsoft.DirectX;
 using TgcViewer.Utils.Modifiers;
+using TgcViewer.Utils.TgcSceneLoader;
 
 namespace AlumnoEjemplos.MiGrupo
 {
@@ -19,6 +20,10 @@ namespace AlumnoEjemplos.MiGrupo
         /// Categoría a la que pertenece el ejemplo.
         /// Influye en donde se va a haber en el árbol de la derecha de la pantalla.
         /// </summary>
+        /// 
+        //Floor piso;
+        private TgcScene escenario;
+
         public override string getCategory()
         {
             return "AlumnoEjemplos";
@@ -29,7 +34,7 @@ namespace AlumnoEjemplos.MiGrupo
         /// </summary>
         public override string getName()
         {
-            return "Grupo 99";
+            return "Manaos Games";
         }
 
         /// <summary>
@@ -37,7 +42,7 @@ namespace AlumnoEjemplos.MiGrupo
         /// </summary>
         public override string getDescription()
         {
-            return "MiIdea - Descripcion de la idea";
+            return " - Se trata de resolver puzzles jugando con las perspectivas de los objetos.";
         }
 
         /// <summary>
@@ -51,6 +56,7 @@ namespace AlumnoEjemplos.MiGrupo
 
             //Device de DirectX para crear primitivas
             Device d3dDevice = GuiController.Instance.D3dDevice;
+            
 
             //Carpeta de archivos Media del alumno
             string alumnoMediaFolder = GuiController.Instance.AlumnoEjemplosMediaDir;
@@ -64,7 +70,7 @@ namespace AlumnoEjemplos.MiGrupo
             //Cargar valor en UserVar
             GuiController.Instance.UserVars.setValue("variablePrueba", 5451);
 
-
+            TgcSceneLoader loader = new TgcSceneLoader();
 
             ///////////////MODIFIERS//////////////////
 
@@ -78,26 +84,24 @@ namespace AlumnoEjemplos.MiGrupo
             //Crear un modifier para modificar un vértice
             GuiController.Instance.Modifiers.addVertex3f("valorVertice", new Vector3(-100, -100, -100), new Vector3(50, 50, 50), new Vector3(0, 0, 0));
 
-
+            escenario = loader.loadSceneFromFile(GuiController.Instance.AlumnoEjemplosMediaDir + "\\Nivel1-TgcScene.xml");
 
             ///////////////CONFIGURAR CAMARA ROTACIONAL//////////////////
             //Es la camara que viene por default, asi que no hace falta hacerlo siempre
-            GuiController.Instance.RotCamera.Enable = true;
+            //GuiController.Instance.RotCamera.Enable = true;
             //Configurar centro al que se mira y distancia desde la que se mira
-            GuiController.Instance.RotCamera.setCamera(new Vector3(0, 0, 0), 100);
+            //GuiController.Instance.RotCamera.setCamera(new Vector3(0, 0, 0), 100);
 
 
-            /*
+            
             ///////////////CONFIGURAR CAMARA PRIMERA PERSONA//////////////////
             //Camara en primera persona, tipo videojuego FPS
             //Solo puede haber una camara habilitada a la vez. Al habilitar la camara FPS se deshabilita la camara rotacional
             //Por default la camara FPS viene desactivada
             GuiController.Instance.FpsCamera.Enable = true;
             //Configurar posicion y hacia donde se mira
-            GuiController.Instance.FpsCamera.setCamera(new Vector3(0, 0, -20), new Vector3(0, 0, 0));
-            */
-
-
+            GuiController.Instance.FpsCamera.setCamera(escenario.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0));
+            
 
             ///////////////LISTAS EN C#//////////////////
             //crear
@@ -147,6 +151,8 @@ namespace AlumnoEjemplos.MiGrupo
             float valorFloat = (float)GuiController.Instance.Modifiers["valorFloat"];
             string opcionElegida = (string)GuiController.Instance.Modifiers["valorIntervalo"];
             Vector3 valorVertice = (Vector3)GuiController.Instance.Modifiers["valorVertice"];
+
+            escenario.renderAll();
 
 
             ///////////////INPUT//////////////////
