@@ -1,0 +1,13 @@
+<roomsEditor-Map>
+  <mapSettings width="2000" height="2000" scaleX="1" scaleY="1" scaleZ="1" />
+  <rooms count="1">
+    <room name="Nivel1" x="40" y="70" width="1500" length="1500" height="500" floorLevel="0">
+      <wall name="Roof" textureName="madera.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="madera.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="madera.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="madera.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="madera.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="madera.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+  </rooms>
+</roomsEditor-Map>
