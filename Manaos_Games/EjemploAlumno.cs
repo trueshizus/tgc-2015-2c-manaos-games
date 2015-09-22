@@ -8,6 +8,7 @@ using System.Drawing;
 using Microsoft.DirectX;
 using TgcViewer.Utils.Modifiers;
 using TgcViewer.Utils.TgcSceneLoader;
+using TgcViewer.Utils.Terrain;
 
 namespace AlumnoEjemplos.MiGrupo
 {
@@ -56,7 +57,10 @@ namespace AlumnoEjemplos.MiGrupo
 
             //Device de DirectX para crear primitivas
             Device d3dDevice = GuiController.Instance.D3dDevice;
-            
+
+            TgcSkyBox skyBox;
+
+            skyBox = new TgcSkyBox();
 
             //Carpeta de archivos Media del alumno
             string alumnoMediaFolder = GuiController.Instance.AlumnoEjemplosMediaDir;
@@ -92,15 +96,15 @@ namespace AlumnoEjemplos.MiGrupo
             //Configurar centro al que se mira y distancia desde la que se mira
             //GuiController.Instance.RotCamera.setCamera(new Vector3(0, 0, 0), 100);
 
-
-            
-            ///////////////CONFIGURAR CAMARA PRIMERA PERSONA//////////////////
-            //Camara en primera persona, tipo videojuego FPS
-            //Solo puede haber una camara habilitada a la vez. Al habilitar la camara FPS se deshabilita la camara rotacional
-            //Por default la camara FPS viene desactivada
+         
+            //FPS Camara
             GuiController.Instance.FpsCamera.Enable = true;
-            //Configurar posicion y hacia donde se mira
-            GuiController.Instance.FpsCamera.setCamera(escenario.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0));
+            GuiController.Instance.FpsCamera.setCamera(new Vector3(escenario.BoundingBox.calculateBoxCenter().X, 
+                                                                   escenario.BoundingBox.PMin.Y + 100f, 
+                                                                   escenario.BoundingBox.calculateBoxCenter().Z), 
+                                                       new Vector3(-140f, 40f, -120f));
+            GuiController.Instance.FpsCamera.MovementSpeed = 200f;
+            GuiController.Instance.FpsCamera.JumpSpeed = 200f;
             
 
             ///////////////LISTAS EN C#//////////////////
