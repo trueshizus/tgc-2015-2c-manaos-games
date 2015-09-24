@@ -3,14 +3,14 @@
   <texturesExport enabled="True" dir="Textures" />
   <lightmapExport enabled="False" dir="LightMaps" />
   <sceneBoundingBox min="[170,0,280]" max="[4670,1500,4780]" />
-  <materials count="3">
+  <materials count="2">
     <m name="Standardmaterial" type="Standardmaterial">
       <ambient>[0,0,0,0]</ambient>
       <diffuse>[0,0,0,0]</diffuse>
       <specular>[0,0,0,0]</specular>
       <opacity>1</opacity>
       <alphaBlendEnable>False</alphaBlendEnable>
-      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">brick3_1.jpg</bitmap>
+      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">wall2.jpg</bitmap>
     </m>
     <m name="Standardmaterial" type="Standardmaterial">
       <ambient>[0,0,0,0]</ambient>
@@ -18,15 +18,7 @@
       <specular>[0,0,0,0]</specular>
       <opacity>1</opacity>
       <alphaBlendEnable>False</alphaBlendEnable>
-      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">tilefloor7_ow.jpg</bitmap>
-    </m>
-    <m name="Standardmaterial" type="Standardmaterial">
-      <ambient>[0,0,0,0]</ambient>
-      <diffuse>[0,0,0,0]</diffuse>
-      <specular>[0,0,0,0]</specular>
-      <opacity>1</opacity>
-      <alphaBlendEnable>False</alphaBlendEnable>
-      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">brick3_5.jpg</bitmap>
+      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">floor1.jpg</bitmap>
     </m>
   </materials>
   <meshes count="5">
@@ -45,7 +37,7 @@
       <texCoordsLightMap count="0">
       </texCoordsLightMap>
     </mesh>
-    <mesh name="Nivel1-East-0" layer="" type="Original" matId="2" color="[1,1,1]" visibility="1.0" lightmap="">
+    <mesh name="Nivel1-East-0" layer="" type="Original" matId="0" color="[1,1,1]" visibility="1.0" lightmap="">
       <boundingBox min="[4670,0,280]" max="[4670,1500,4780]" />
       <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
       <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
@@ -55,12 +47,12 @@
       </textCoordsLightMapIdx>
       <vertices count="12">4670 0 280 4670 0 4780 4670 1500 4780 4670 1500 280 </vertices>
       <normals count="12">-1 0 0 -1 0 0 -1 0 0 -1 0 0 </normals>
-      <texCoords count="8">10 5 0 5 0 0 10 0 </texCoords>
+      <texCoords count="8">6 2 0 2 0 0 6 0 </texCoords>
       <colors count="3">255 255 255 </colors>
       <texCoordsLightMap count="0">
       </texCoordsLightMap>
     </mesh>
-    <mesh name="Nivel1-West-0" layer="" type="Original" matId="2" color="[1,1,1]" visibility="1.0" lightmap="">
+    <mesh name="Nivel1-West-0" layer="" type="Original" matId="0" color="[1,1,1]" visibility="1.0" lightmap="">
       <boundingBox min="[170,0,280]" max="[170,1500,4780]" />
       <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
       <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
@@ -70,7 +62,7 @@
       </textCoordsLightMapIdx>
       <vertices count="12">170 0 280 170 0 4780 170 1500 4780 170 1500 280 </vertices>
       <normals count="12">-1 0 0 -1 0 0 -1 0 0 -1 0 0 </normals>
-      <texCoords count="8">10 5 0 5 0 0 10 0 </texCoords>
+      <texCoords count="8">6 2 0 2 0 0 6 0 </texCoords>
       <colors count="3">255 255 255 </colors>
       <texCoordsLightMap count="0">
       </texCoordsLightMap>
@@ -85,7 +77,7 @@
       </textCoordsLightMapIdx>
       <vertices count="12">170 0 280 4670 0 280 4670 1500 280 170 1500 280 </vertices>
       <normals count="12">0 0 1 0 0 1 0 0 1 0 0 1 </normals>
-      <texCoords count="8">10 5 0 5 0 0 10 0 </texCoords>
+      <texCoords count="8">6 2 0 2 0 0 6 0 </texCoords>
       <colors count="3">255 255 255 </colors>
       <texCoordsLightMap count="0">
       </texCoordsLightMap>
@@ -100,7 +92,7 @@
       </textCoordsLightMapIdx>
       <vertices count="12">170 0 4780 4670 0 4780 4670 1500 4780 170 1500 4780 </vertices>
       <normals count="12">0 0 1 0 0 1 0 0 1 0 0 1 </normals>
-      <texCoords count="8">10 5 0 5 0 0 10 0 </texCoords>
+      <texCoords count="8">6 2 0 2 0 0 6 0 </texCoords>
       <colors count="3">255 255 255 </colors>
       <texCoordsLightMap count="0">
       </texCoordsLightMap>

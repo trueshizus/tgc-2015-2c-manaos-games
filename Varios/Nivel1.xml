@@ -2,12 +2,12 @@
   <mapSettings width="5000" height="5000" scaleX="1" scaleY="1" scaleZ="1" />
   <rooms count="1">
     <room name="Nivel1" x="170" y="280" width="4500" length="4500" height="1500" floorLevel="0">
-      <wall name="Roof" textureName="brick3_1.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
-      <wall name="Floor" textureName="tilefloor7_ow.jpg" autoAdjustUv="False" uTile="10" vTile="10" />
-      <wall name="East" textureName="brick3_5.jpg" autoAdjustUv="False" uTile="10" vTile="5" />
-      <wall name="West" textureName="brick3_5.jpg" autoAdjustUv="False" uTile="10" vTile="5" />
-      <wall name="North" textureName="brick3_1.jpg" autoAdjustUv="False" uTile="10" vTile="5" />
-      <wall name="South" textureName="brick3_1.jpg" autoAdjustUv="False" uTile="10" vTile="5" />
+      <wall name="Roof" textureName="wall2.jpg" autoAdjustUv="False" uTile="10" vTile="5" />
+      <wall name="Floor" textureName="floor1.jpg" autoAdjustUv="True" uTile="10" vTile="10" />
+      <wall name="East" textureName="wall2.jpg" autoAdjustUv="True" uTile="6" vTile="2" />
+      <wall name="West" textureName="wall2.jpg" autoAdjustUv="True" uTile="6" vTile="2" />
+      <wall name="North" textureName="wall2.jpg" autoAdjustUv="True" uTile="6" vTile="2" />
+      <wall name="South" textureName="wall2.jpg" autoAdjustUv="True" uTile="6" vTile="2" />
     </room>
   </rooms>
 </roomsEditor-Map>

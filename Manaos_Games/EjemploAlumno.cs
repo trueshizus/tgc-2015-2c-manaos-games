@@ -24,6 +24,8 @@ namespace AlumnoEjemplos.MiGrupo
         /// 
         //Floor piso;
         private TgcScene escenario;
+        private TgcSkyBox skyBox;
+
 
         public override string getCategory()
         {
@@ -57,38 +59,32 @@ namespace AlumnoEjemplos.MiGrupo
 
             //Device de DirectX para crear primitivas
             Device d3dDevice = GuiController.Instance.D3dDevice;
-
-            TgcSkyBox skyBox;
-
-            skyBox = new TgcSkyBox();
+            TgcSceneLoader loader = new TgcSceneLoader();
 
             //Carpeta de archivos Media del alumno
             string alumnoMediaFolder = GuiController.Instance.AlumnoEjemplosMediaDir;
 
+            skyBox = new TgcSkyBox();
+            skyBox.Size = new Vector3(8000, 3000, 8000);
 
-            ///////////////USER VARS//////////////////
+            //Configurar color
+            //skyBox.Color = Color.OrangeRed;
 
-            //Crear una UserVar
-            GuiController.Instance.UserVars.addVar("variablePrueba");
-
-            //Cargar valor en UserVar
-            GuiController.Instance.UserVars.setValue("variablePrueba", 5451);
-
-            TgcSceneLoader loader = new TgcSceneLoader();
-
-            ///////////////MODIFIERS//////////////////
-
-            //Crear un modifier para un valor FLOAT
-            GuiController.Instance.Modifiers.addFloat("valorFloat", -50f, 200f, 0f);
-
-            //Crear un modifier para un ComboBox con opciones
-            string[] opciones = new string[]{"opcion1", "opcion2", "opcion3"};
-            GuiController.Instance.Modifiers.addInterval("valorIntervalo", opciones, 0);
-
-            //Crear un modifier para modificar un vértice
-            GuiController.Instance.Modifiers.addVertex3f("valorVertice", new Vector3(-100, -100, -100), new Vector3(50, 50, 50), new Vector3(0, 0, 0));
-
+            //Configurar las texturas para cada una de las 6 caras
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, alumnoMediaFolder + "Textures\\" + "city_top.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, alumnoMediaFolder + "Textures\\" + "city_down.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, alumnoMediaFolder + "Textures\\" + "city_left.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, alumnoMediaFolder + "Textures\\" + "city_right.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, alumnoMediaFolder + "Textures\\" + "city_front.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, alumnoMediaFolder + "Textures\\" + "city_back.jpg");
+           
             escenario = loader.loadSceneFromFile(GuiController.Instance.AlumnoEjemplosMediaDir + "\\Nivel1-TgcScene.xml");
+
+            skyBox.Center = escenario.BoundingBox.calculateBoxCenter();
+         
+            //Actualizar todos los valores para crear el SkyBox
+            skyBox.updateValues();
+
 
             ///////////////CONFIGURAR CAMARA ROTACIONAL//////////////////
             //Es la camara que viene por default, asi que no hace falta hacerlo siempre
@@ -146,18 +142,8 @@ namespace AlumnoEjemplos.MiGrupo
             //Device de DirectX para renderizar
             Device d3dDevice = GuiController.Instance.D3dDevice;
 
-
-            //Obtener valor de UserVar (hay que castear)
-            int valor = (int)GuiController.Instance.UserVars.getValue("variablePrueba");
-
-
-            //Obtener valores de Modifiers
-            float valorFloat = (float)GuiController.Instance.Modifiers["valorFloat"];
-            string opcionElegida = (string)GuiController.Instance.Modifiers["valorIntervalo"];
-            Vector3 valorVertice = (Vector3)GuiController.Instance.Modifiers["valorVertice"];
-
             escenario.renderAll();
-
+            skyBox.render();
 
             ///////////////INPUT//////////////////
             //conviene deshabilitar ambas camaras para que no haya interferencia
