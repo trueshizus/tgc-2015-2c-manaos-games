@@ -1,14 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using TgcViewer.Example;
+using AlumnoEjemplos.Manaos_Games;
+//using Microsoft.DirectX.Direct3D;
+//using Microsoft.DirectX.DirectInput;
 using TgcViewer;
-using Microsoft.DirectX.Direct3D;
-using System.Drawing;
-using Microsoft.DirectX;
-using TgcViewer.Utils.Modifiers;
-using TgcViewer.Utils.TgcSceneLoader;
+using TgcViewer.Example;
+using TgcViewer.Utils.Input;
 using TgcViewer.Utils.Terrain;
+using TgcViewer.Utils.TgcGeometry;
+using TgcViewer.Utils.TgcSceneLoader;
+using Microsoft.DirectX;
+using Microsoft.DirectX.Direct3D;
+using Microsoft.DirectX.DirectInput;
+using System.Collections.Generic;
 
 namespace AlumnoEjemplos.MiGrupo
 {
@@ -25,6 +27,9 @@ namespace AlumnoEjemplos.MiGrupo
         //Floor piso;
         private TgcScene escenario;
         private TgcSkyBox skyBox;
+        private Cuadro cuadroPared;
+        private TgcBoundingBox playerBB;
+        List<TgcMesh> obstaculos;
 
 
         public override string getCategory()
@@ -49,6 +54,15 @@ namespace AlumnoEjemplos.MiGrupo
         }
 
         /// <summary>
+        /// AABB que representa el volumen del jugador o camara
+        /// </summary>
+        public TgcBoundingBox PlayerBB
+        {
+            get { return playerBB; }
+            set { playerBB = value; }
+        }
+
+        /// <summary>
         /// Método que se llama una sola vez,  al principio cuando se ejecuta el ejemplo.
         /// Escribir aquí todo el código de inicialización: cargar modelos, texturas, modifiers, uservars, etc.
         /// Borrar todo lo que no haga falta
@@ -58,14 +72,16 @@ namespace AlumnoEjemplos.MiGrupo
             //GuiController.Instance: acceso principal a todas las herramientas del Framework
 
             //Device de DirectX para crear primitivas
-            Device d3dDevice = GuiController.Instance.D3dDevice;
+            Microsoft.DirectX.Direct3D.Device d3dDevice = GuiController.Instance.D3dDevice;
             TgcSceneLoader loader = new TgcSceneLoader();
+
+            obstaculos = new List<TgcMesh>();
 
             //Carpeta de archivos Media del alumno
             string alumnoMediaFolder = GuiController.Instance.AlumnoEjemplosMediaDir;
 
             skyBox = new TgcSkyBox();
-            skyBox.Size = new Vector3(8000, 3000, 8000);
+            skyBox.Size = new Vector3(8000, 2000, 8000);
 
             //Configurar color
             //skyBox.Color = Color.OrangeRed;
@@ -85,49 +101,27 @@ namespace AlumnoEjemplos.MiGrupo
             //Actualizar todos los valores para crear el SkyBox
             skyBox.updateValues();
 
-
-            ///////////////CONFIGURAR CAMARA ROTACIONAL//////////////////
-            //Es la camara que viene por default, asi que no hace falta hacerlo siempre
-            //GuiController.Instance.RotCamera.Enable = true;
-            //Configurar centro al que se mira y distancia desde la que se mira
-            //GuiController.Instance.RotCamera.setCamera(new Vector3(0, 0, 0), 100);
-
+            cuadroPared = new Cuadro(new Vector3(escenario.BoundingBox.calculateBoxCenter().X,
+                                                 escenario.BoundingBox.PMin.Y + 300f, 
+                                                 escenario.BoundingBox.PMin.Z),
+                                       new Vector3(500, 250, 25));
          
             //FPS Camara
+            GuiController.Instance.FpsCamera.AccelerationEnable = true;
             GuiController.Instance.FpsCamera.Enable = true;
+            //GuiController.Instance.FpsCamera.MovementSpeed = 200f;
+            //GuiController.Instance.FpsCamera.JumpSpeed = 200f;
+            GuiController.Instance.FpsCamera.Velocity = new Vector3(200f, 200f, 200f);
+            GuiController.Instance.FpsCamera.Acceleration = new Vector3(500f, 500f, 500f);
             GuiController.Instance.FpsCamera.setCamera(new Vector3(escenario.BoundingBox.calculateBoxCenter().X, 
-                                                                   escenario.BoundingBox.PMin.Y + 100f, 
-                                                                   escenario.BoundingBox.calculateBoxCenter().Z), 
+                                                                   escenario.BoundingBox.PMin.Y + 200f, 
+                                                                   escenario.BoundingBox.calculateBoxCenter().Z),
                                                        new Vector3(-140f, 40f, -120f));
-            GuiController.Instance.FpsCamera.MovementSpeed = 200f;
-            GuiController.Instance.FpsCamera.JumpSpeed = 200f;
-            
 
-            ///////////////LISTAS EN C#//////////////////
-            //crear
-            List<string> lista = new List<string>();
-
-            //agregar elementos
-            lista.Add("elemento1");
-            lista.Add("elemento2");
-
-            //obtener elementos
-            string elemento1 = lista[0];
-
-            //bucle foreach
-            foreach (string elemento in lista)
+            foreach (TgcMesh pared in escenario.Meshes)
             {
-                //Loggear por consola del Framework
-                GuiController.Instance.Logger.log(elemento);
+                obstaculos.Add(pared);
             }
-
-            //bucle for
-            for (int i = 0; i < lista.Count; i++)
-            {
-                string element = lista[i];
-            }
-
-
         }
 
 
@@ -140,10 +134,15 @@ namespace AlumnoEjemplos.MiGrupo
         public override void render(float elapsedTime)
         {
             //Device de DirectX para renderizar
-            Device d3dDevice = GuiController.Instance.D3dDevice;
+            Microsoft.DirectX.Direct3D.Device d3dDevice = GuiController.Instance.D3dDevice;
+            TgcD3dInput d3dInput = GuiController.Instance.D3dInput;
+            bool moving = false;
+            //Calcular proxima posicion de personaje segun Input
+            float moveForward = 0f;
 
             escenario.renderAll();
             skyBox.render();
+            cuadroPared.Render();
 
             ///////////////INPUT//////////////////
             //conviene deshabilitar ambas camaras para que no haya interferencia
@@ -158,6 +157,49 @@ namespace AlumnoEjemplos.MiGrupo
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
                 //Boton izq apretado
+            }
+
+            //Adelante
+            if (d3dInput.keyDown(Key.W))
+            {
+                moveForward = -GuiController.Instance.FpsCamera.MovementSpeed;
+                moving = true;
+            }
+
+            //Atras
+            if (d3dInput.keyDown(Key.S))
+            {
+                moveForward = GuiController.Instance.FpsCamera.MovementSpeed;
+                moving = true;
+            }
+
+            //Si hubo desplazamiento
+            if (moving)
+            {
+                Vector3 lastPos = GuiController.Instance.FpsCamera.Position;
+
+                //TgcBoundingBox boxCamara = new TgcBoundingBox( 
+                //La velocidad de movimiento tiene que multiplicarse por el elapsedTime para hacerse independiente de la velocida de CPU
+                //Ver Unidad 2: Ciclo acoplado vs ciclo desacoplado
+                //personaje.moveOrientedY(moveForward * elapsedTime);
+
+                //Detectar colisiones
+                /*bool collide = false;
+                foreach (TgcMesh obstaculo in obstaculos)
+                {
+                    TgcCollisionUtils.BoxBoxResult result = TgcCollisionUtils.classifyBoxBox(playerBB, obstaculo.BoundingBox);
+                    if (result == TgcCollisionUtils.BoxBoxResult.Adentro || result == TgcCollisionUtils.BoxBoxResult.Atravesando)
+                    {
+                        collide = true;
+                        break;
+                    }
+                }
+
+                //Si hubo colision, restaurar la posicion anterior
+                if (collide)
+                {
+                    GuiController.Instance.FpsCamera.setCamera(lastPos, new Vector3(-140f, 40f, -120f));
+                } */                
             }
 
         }

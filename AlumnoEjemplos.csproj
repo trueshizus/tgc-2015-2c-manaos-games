@@ -87,6 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Manaos_Games\Cuadro.cs" />
     <Compile Include="Manaos_Games\EjemploAlumno.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
