@@ -24,10 +24,14 @@ namespace AlumnoEjemplos.Manaos_Games
             box.setTexture(texture);
         }
 
+        public TgcMesh GetMesh()
+        {
+            return box.toMesh("Cuadro"); 
+        }
+
         public void Render()
         {
-            box.render();
+             box.render();
         }
-        
     }
 }

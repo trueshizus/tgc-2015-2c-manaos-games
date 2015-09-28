@@ -30,6 +30,13 @@ namespace AlumnoEjemplos.MiGrupo
         private Cuadro cuadroPared;
         private TgcBoundingBox playerBB;
         List<TgcMesh> obstaculos;
+        List<TgcMesh> seleccionables;
+
+        TgcPickingRay pickingRay;
+        Vector3 collisionPoint;
+        //TgcBox collisionPointMesh;
+        bool selected;
+        TgcMesh selectedMesh;
 
 
         public override string getCategory()
@@ -76,6 +83,7 @@ namespace AlumnoEjemplos.MiGrupo
             TgcSceneLoader loader = new TgcSceneLoader();
 
             obstaculos = new List<TgcMesh>();
+            seleccionables = new List<TgcMesh>();
 
             //Carpeta de archivos Media del alumno
             string alumnoMediaFolder = GuiController.Instance.AlumnoEjemplosMediaDir;
@@ -122,6 +130,13 @@ namespace AlumnoEjemplos.MiGrupo
             {
                 obstaculos.Add(pared);
             }
+
+            seleccionables.Add(cuadroPared.GetMesh());
+
+            //Iniciarlizar PickingRay
+            pickingRay = new TgcPickingRay();
+
+
         }
 
 
@@ -139,10 +154,6 @@ namespace AlumnoEjemplos.MiGrupo
             bool moving = false;
             //Calcular proxima posicion de personaje segun Input
             float moveForward = 0f;
-
-            escenario.renderAll();
-            skyBox.render();
-            cuadroPared.Render();
 
             ///////////////INPUT//////////////////
             //conviene deshabilitar ambas camaras para que no haya interferencia
@@ -202,6 +213,38 @@ namespace AlumnoEjemplos.MiGrupo
                 } */                
             }
 
+            //Si hacen clic con el mouse, ver si hay colision RayAABB
+            if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
+            {
+                //Actualizar Ray de colisión en base a posición del mouse
+                pickingRay.updateRay();
+
+
+                //Testear Ray contra el AABB de todos los meshes
+                foreach (TgcMesh objeto in seleccionables)
+                {
+                    TgcBoundingBox aabb = objeto.BoundingBox;
+
+                    //Ejecutar test, si devuelve true se carga el punto de colision collisionPoint
+                    selected = TgcCollisionUtils.intersectRayAABB(pickingRay.Ray, aabb, out collisionPoint);
+
+                    if (selected)
+                    {
+                        selectedMesh = objeto;
+                        break;
+                    }
+                }
+            }
+
+            escenario.renderAll();
+            skyBox.render();
+            cuadroPared.Render();
+
+            if (selected)
+            {
+                //Render de AABB
+                selectedMesh.BoundingBox.render();
+            }
         }
 
         /// <summary>
