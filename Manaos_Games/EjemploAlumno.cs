@@ -28,15 +28,18 @@ namespace AlumnoEjemplos.MiGrupo
         private TgcScene escenario;
         private TgcSkyBox skyBox;
         private Cuadro cuadroPared;
-        private TgcBoundingBox playerBB;
-        List<TgcMesh> obstaculos;
+        List<TgcBoundingBox> obstaculos;
         List<TgcMesh> seleccionables;
+
+        ManejadorColisiones colisionador;
 
         TgcPickingRay pickingRay;
         Vector3 collisionPoint;
         //TgcBox collisionPointMesh;
         bool selected;
         TgcMesh selectedMesh;
+
+        Camara fpsCamara;
 
 
         public override string getCategory()
@@ -61,15 +64,6 @@ namespace AlumnoEjemplos.MiGrupo
         }
 
         /// <summary>
-        /// AABB que representa el volumen del jugador o camara
-        /// </summary>
-        public TgcBoundingBox PlayerBB
-        {
-            get { return playerBB; }
-            set { playerBB = value; }
-        }
-
-        /// <summary>
         /// Método que se llama una sola vez,  al principio cuando se ejecuta el ejemplo.
         /// Escribir aquí todo el código de inicialización: cargar modelos, texturas, modifiers, uservars, etc.
         /// Borrar todo lo que no haga falta
@@ -78,11 +72,13 @@ namespace AlumnoEjemplos.MiGrupo
         {
             //GuiController.Instance: acceso principal a todas las herramientas del Framework
 
+            Vector3 posicionCamara;
+
             //Device de DirectX para crear primitivas
             Microsoft.DirectX.Direct3D.Device d3dDevice = GuiController.Instance.D3dDevice;
             TgcSceneLoader loader = new TgcSceneLoader();
 
-            obstaculos = new List<TgcMesh>();
+            obstaculos = new List<TgcBoundingBox>();
             seleccionables = new List<TgcMesh>();
 
             //Carpeta de archivos Media del alumno
@@ -114,29 +110,34 @@ namespace AlumnoEjemplos.MiGrupo
                                                  escenario.BoundingBox.PMin.Z),
                                        new Vector3(500, 250, 25));
          
-            //FPS Camara
-            GuiController.Instance.FpsCamera.AccelerationEnable = true;
-            GuiController.Instance.FpsCamera.Enable = true;
-            //GuiController.Instance.FpsCamera.MovementSpeed = 200f;
-            //GuiController.Instance.FpsCamera.JumpSpeed = 200f;
-            GuiController.Instance.FpsCamera.Velocity = new Vector3(200f, 200f, 200f);
-            GuiController.Instance.FpsCamera.Acceleration = new Vector3(500f, 500f, 500f);
-            GuiController.Instance.FpsCamera.setCamera(new Vector3(escenario.BoundingBox.calculateBoxCenter().X, 
-                                                                   escenario.BoundingBox.PMin.Y + 200f, 
-                                                                   escenario.BoundingBox.calculateBoxCenter().Z),
-                                                       new Vector3(-140f, 40f, -120f));
+            fpsCamara = new Camara();
 
+            GuiController.Instance.CurrentCamera = fpsCamara;
+
+            fpsCamara.MovementSpeed = 1000f;
+            fpsCamara.RotationSpeed = 2f;
+            
+            posicionCamara = new Vector3(escenario.BoundingBox.calculateBoxCenter().X,
+                                            escenario.BoundingBox.PMin.Y + 200f,
+                                           escenario.BoundingBox.calculateBoxCenter().Z);
+
+            fpsCamara.setCamera(posicionCamara, posicionCamara + new Vector3(1.0f, 0.0f, 0.0f));
+            
+            fpsCamara.updateCamera();
+
+       
             foreach (TgcMesh pared in escenario.Meshes)
             {
-                obstaculos.Add(pared);
+                obstaculos.Add(pared.BoundingBox);
             }
 
+            colisionador = new ManejadorColisiones(fpsCamara, obstaculos);
+            
+            
             seleccionables.Add(cuadroPared.GetMesh());
 
             //Iniciarlizar PickingRay
             pickingRay = new TgcPickingRay();
-
-
         }
 
 
@@ -148,70 +149,7 @@ namespace AlumnoEjemplos.MiGrupo
         /// <param name="elapsedTime">Tiempo en segundos transcurridos desde el último frame</param>
         public override void render(float elapsedTime)
         {
-            //Device de DirectX para renderizar
-            Microsoft.DirectX.Direct3D.Device d3dDevice = GuiController.Instance.D3dDevice;
-            TgcD3dInput d3dInput = GuiController.Instance.D3dInput;
-            bool moving = false;
-            //Calcular proxima posicion de personaje segun Input
-            float moveForward = 0f;
-
-            ///////////////INPUT//////////////////
-            //conviene deshabilitar ambas camaras para que no haya interferencia
-
-            //Capturar Input teclado 
-            if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
-            {
-                //Tecla F apretada
-            }
-
-            //Capturar Input Mouse
-            if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
-            {
-                //Boton izq apretado
-            }
-
-            //Adelante
-            if (d3dInput.keyDown(Key.W))
-            {
-                moveForward = -GuiController.Instance.FpsCamera.MovementSpeed;
-                moving = true;
-            }
-
-            //Atras
-            if (d3dInput.keyDown(Key.S))
-            {
-                moveForward = GuiController.Instance.FpsCamera.MovementSpeed;
-                moving = true;
-            }
-
-            //Si hubo desplazamiento
-            if (moving)
-            {
-                Vector3 lastPos = GuiController.Instance.FpsCamera.Position;
-
-                //TgcBoundingBox boxCamara = new TgcBoundingBox( 
-                //La velocidad de movimiento tiene que multiplicarse por el elapsedTime para hacerse independiente de la velocida de CPU
-                //Ver Unidad 2: Ciclo acoplado vs ciclo desacoplado
-                //personaje.moveOrientedY(moveForward * elapsedTime);
-
-                //Detectar colisiones
-                /*bool collide = false;
-                foreach (TgcMesh obstaculo in obstaculos)
-                {
-                    TgcCollisionUtils.BoxBoxResult result = TgcCollisionUtils.classifyBoxBox(playerBB, obstaculo.BoundingBox);
-                    if (result == TgcCollisionUtils.BoxBoxResult.Adentro || result == TgcCollisionUtils.BoxBoxResult.Atravesando)
-                    {
-                        collide = true;
-                        break;
-                    }
-                }
-
-                //Si hubo colision, restaurar la posicion anterior
-                if (collide)
-                {
-                    GuiController.Instance.FpsCamera.setCamera(lastPos, new Vector3(-140f, 40f, -120f));
-                } */                
-            }
+            colisionador.update();
 
             //Si hacen clic con el mouse, ver si hay colision RayAABB
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
@@ -239,12 +177,10 @@ namespace AlumnoEjemplos.MiGrupo
             escenario.renderAll();
             skyBox.render();
             cuadroPared.Render();
+            //fpsCamara.updateCamera();
 
             if (selected)
-            {
-                //Render de AABB
                 selectedMesh.BoundingBox.render();
-            }
         }
 
         /// <summary>

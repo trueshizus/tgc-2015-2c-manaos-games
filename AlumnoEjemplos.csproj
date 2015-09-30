@@ -87,8 +87,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Manaos_Games\Camara.cs" />
     <Compile Include="Manaos_Games\Cuadro.cs" />
     <Compile Include="Manaos_Games\EjemploAlumno.cs" />
+    <Compile Include="Manaos_Games\ManejadorColisiones.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
