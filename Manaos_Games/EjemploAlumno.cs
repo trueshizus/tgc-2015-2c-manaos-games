@@ -24,23 +24,15 @@ namespace AlumnoEjemplos.MiGrupo
         /// Influye en donde se va a haber en el árbol de la derecha de la pantalla.
         /// </summary>
         /// 
-        //Floor piso;
-        private TgcScene escenario;
-        private TgcSkyBox skyBox;
-        private Cuadro cuadroPared;
-        List<TgcBoundingBox> obstaculos;
-        List<TgcMesh> seleccionables;
-
         ManejadorColisiones colisionador;
 
         TgcPickingRay pickingRay;
         Vector3 collisionPoint;
-        //TgcBox collisionPointMesh;
         bool selected;
         TgcMesh selectedMesh;
+        Nivel1 nivel;
 
         Camara fpsCamara;
-
 
         public override string getCategory()
         {
@@ -72,44 +64,12 @@ namespace AlumnoEjemplos.MiGrupo
         {
             //GuiController.Instance: acceso principal a todas las herramientas del Framework
 
-            Vector3 posicionCamara;
-
             //Device de DirectX para crear primitivas
             Microsoft.DirectX.Direct3D.Device d3dDevice = GuiController.Instance.D3dDevice;
             TgcSceneLoader loader = new TgcSceneLoader();
 
-            obstaculos = new List<TgcBoundingBox>();
-            seleccionables = new List<TgcMesh>();
-
-            //Carpeta de archivos Media del alumno
-            string alumnoMediaFolder = GuiController.Instance.AlumnoEjemplosMediaDir;
-
-            skyBox = new TgcSkyBox();
-            skyBox.Size = new Vector3(8000, 2000, 8000);
-
-            //Configurar color
-            //skyBox.Color = Color.OrangeRed;
-
-            //Configurar las texturas para cada una de las 6 caras
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, alumnoMediaFolder + "Textures\\" + "city_top.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, alumnoMediaFolder + "Textures\\" + "city_down.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, alumnoMediaFolder + "Textures\\" + "city_left.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, alumnoMediaFolder + "Textures\\" + "city_right.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, alumnoMediaFolder + "Textures\\" + "city_front.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, alumnoMediaFolder + "Textures\\" + "city_back.jpg");
-           
-            escenario = loader.loadSceneFromFile(GuiController.Instance.AlumnoEjemplosMediaDir + "\\Nivel1-TgcScene.xml");
-
-            skyBox.Center = escenario.BoundingBox.calculateBoxCenter();
-         
-            //Actualizar todos los valores para crear el SkyBox
-            skyBox.updateValues();
-
-            cuadroPared = new Cuadro(new Vector3(escenario.BoundingBox.calculateBoxCenter().X,
-                                                 escenario.BoundingBox.PMin.Y + 300f, 
-                                                 escenario.BoundingBox.PMin.Z),
-                                       new Vector3(500, 250, 25));
-         
+            nivel = new Nivel1();
+  
             fpsCamara = new Camara();
 
             GuiController.Instance.CurrentCamera = fpsCamara;
@@ -117,25 +77,12 @@ namespace AlumnoEjemplos.MiGrupo
             fpsCamara.MovementSpeed = 1000f;
             fpsCamara.RotationSpeed = 2f;
             
-            posicionCamara = new Vector3(escenario.BoundingBox.calculateBoxCenter().X,
-                                            escenario.BoundingBox.PMin.Y + 200f,
-                                           escenario.BoundingBox.calculateBoxCenter().Z);
-
-            fpsCamara.setCamera(posicionCamara, posicionCamara + new Vector3(1.0f, 0.0f, 0.0f));
+            fpsCamara.setCamera(nivel.posicionInicial(), nivel.orientacionCamara());
             
             fpsCamara.updateCamera();
 
-       
-            foreach (TgcMesh pared in escenario.Meshes)
-            {
-                obstaculos.Add(pared.BoundingBox);
-            }
-
-            colisionador = new ManejadorColisiones(fpsCamara, obstaculos);
-            
-            
-            seleccionables.Add(cuadroPared.GetMesh());
-
+            colisionador = new ManejadorColisiones(fpsCamara, nivel.Obstaculos);
+ 
             //Iniciarlizar PickingRay
             pickingRay = new TgcPickingRay();
         }
@@ -159,7 +106,7 @@ namespace AlumnoEjemplos.MiGrupo
 
 
                 //Testear Ray contra el AABB de todos los meshes
-                foreach (TgcMesh objeto in seleccionables)
+                foreach (TgcMesh objeto in nivel.Seleccionables)
                 {
                     TgcBoundingBox aabb = objeto.BoundingBox;
 
@@ -174,10 +121,7 @@ namespace AlumnoEjemplos.MiGrupo
                 }
             }
 
-            escenario.renderAll();
-            skyBox.render();
-            cuadroPared.Render();
-            //fpsCamara.updateCamera();
+            nivel.Render();
 
             if (selected)
                 selectedMesh.BoundingBox.render();

@@ -20,7 +20,7 @@ namespace AlumnoEjemplos.Manaos_Games
         private Matrix viewMatrix = Matrix.Identity;
         private Vector3 forwardDirection = new Vector3();
         private Vector3 sideDirection = new Vector3();
-        private bool lockCam = false;
+        private bool lockCam = true;
         protected Point mouseCenter;
         private float movementSpeed;
         private float rotationSpeed;

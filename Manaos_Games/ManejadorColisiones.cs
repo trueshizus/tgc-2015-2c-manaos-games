@@ -120,7 +120,7 @@ namespace AlumnoEjemplos.Manaos_Games
                 //camPos = camPos + velocidad * elapsedTime;
                 //camPos.Y -= kEpsilon * 1.5f;
 
-                TgcBoundingBox camaraBoundingBox = new TgcBoundingBox(antCamPos, camPos);
+                TgcBoundingBox camaraBoundingBox = new TgcBoundingBox(antCamPos, new Vector3(antCamPos.X + 100f, antCamPos.Y + 100f, antCamPos.Z + 100f));
 
                 bool collide = false;
 
