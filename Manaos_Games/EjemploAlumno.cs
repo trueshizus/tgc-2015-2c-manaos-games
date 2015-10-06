@@ -25,6 +25,7 @@ namespace AlumnoEjemplos.MiGrupo
         /// </summary>
         /// 
         ManejadorColisiones colisionador;
+        SphereCollisionManager collisionManager;
 
         TgcPickingRay pickingRay;
         Vector3 selectionPoint;
@@ -83,7 +84,13 @@ namespace AlumnoEjemplos.MiGrupo
             
             fpsCamara.updateCamera();
 
+
             colisionador = new ManejadorColisiones(fpsCamara, nivel.Obstaculos);
+            
+            //Crear manejador de colisiones
+            collisionManager = new SphereCollisionManager();
+            collisionManager.GravityEnabled = true;
+
  
             //Iniciarlizar PickingRay
             pickingRay = new TgcPickingRay();
@@ -103,7 +110,9 @@ namespace AlumnoEjemplos.MiGrupo
         /// <param name="elapsedTime">Tiempo en segundos transcurridos desde el último frame</param>
         public override void render(float elapsedTime)
         {
-            colisionador.update();
+            //colisionador.update();
+
+            collisionManager.moveCamera(fpsCamara, nivel.Obstaculos);           
 
             //Si hacen clic con el mouse, ver si hay colision RayAABB
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))

@@ -92,6 +92,7 @@
     <Compile Include="Manaos_Games\EjemploAlumno.cs" />
     <Compile Include="Manaos_Games\ManejadorColisiones.cs" />
     <Compile Include="Manaos_Games\Nivel1.cs" />
+    <Compile Include="Manaos_Games\SphereCollisionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

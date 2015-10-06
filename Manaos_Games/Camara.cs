@@ -12,7 +12,7 @@ using Microsoft.DirectX.Direct3D;
 
 namespace AlumnoEjemplos.Manaos_Games
 {
-    class Camara : TgcCamera
+    public class Camara : TgcCamera
     {
         Vector3 eye = new Vector3();
         Vector3 target = new Vector3();
@@ -120,6 +120,58 @@ namespace AlumnoEjemplos.Manaos_Games
             return target;
         }
 
+        public Matrix calculateMovement()
+        {
+            float elapsedTime = GuiController.Instance.ElapsedTime;
+            //Forward
+            if (GuiController.Instance.D3dInput.keyDown(Key.W))
+            {
+                moveForward(MovementSpeed * elapsedTime);
+            }
+
+            //Backward
+            if (GuiController.Instance.D3dInput.keyDown(Key.S))
+            {
+                moveForward(-MovementSpeed * elapsedTime);
+            }
+
+            //Strafe right
+            if (GuiController.Instance.D3dInput.keyDown(Key.D))
+            {
+                moveSide(MovementSpeed * elapsedTime);
+            }
+
+            //Strafe left
+            if (GuiController.Instance.D3dInput.keyDown(Key.A))
+            {
+                moveSide(-MovementSpeed * elapsedTime);
+            }
+
+            //Jump
+            if (GuiController.Instance.D3dInput.keyDown(Key.Space))
+            {
+                moveUp(JumpSpeed * elapsedTime);
+            }
+
+            if (GuiController.Instance.D3dInput.keyPressed(Key.L))
+            {
+                LockCam = !LockCam;
+            }
+
+            if (lockCam)
+            {
+                rotate(-GuiController.Instance.D3dInput.XposRelative * rotationSpeed,
+                       -GuiController.Instance.D3dInput.YposRelative * rotationSpeed);
+            }
+
+
+            if (lockCam)
+                Cursor.Position = mouseCenter;
+
+            return Matrix.LookAtLH(eye, target, up);       
+
+        }
+
         public void updateCamera()
         {
             float elapsedTime = GuiController.Instance.ElapsedTime;
@@ -158,8 +210,7 @@ namespace AlumnoEjemplos.Manaos_Games
                 LockCam = !LockCam;
             }
 
-            //Solo rotar si se esta aprentando el boton izq del mouse
-            if (lockCam || GuiController.Instance.D3dInput.buttonDown(TgcD3dInput.MouseButtons.BUTTON_LEFT))
+            if (lockCam)
             {
                 rotate(-GuiController.Instance.D3dInput.XposRelative*rotationSpeed,
                        -GuiController.Instance.D3dInput.YposRelative*rotationSpeed);
@@ -172,6 +223,11 @@ namespace AlumnoEjemplos.Manaos_Games
             viewMatrix = Matrix.LookAtLH(eye, target, up);
 
             updateViewMatrix(GuiController.Instance.D3dDevice);
+        }
+
+        public void updateViewMatrix(Matrix viewMatrix)
+        {
+            GuiController.Instance.D3dDevice.Transform.View = viewMatrix;
         }
 
         public void updateViewMatrix(Microsoft.DirectX.Direct3D.Device d3dDevice)
