@@ -22,11 +22,21 @@ namespace AlumnoEjemplos.Manaos_Games
             box = TgcBox.fromSize(center, size);
 
             box.setTexture(texture);
+          
         }
 
         public TgcMesh GetMesh()
         {
-            return box.toMesh("Cuadro"); 
+            return box.toMesh("cuadro");
+        }
+
+        public Vector3 GetPosition()
+        {
+            Vector3 pos = new Vector3();
+
+            box.getPosition(pos);
+
+            return pos;
         }
 
         public void Render()

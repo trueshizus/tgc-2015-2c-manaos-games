@@ -27,10 +27,12 @@ namespace AlumnoEjemplos.MiGrupo
         ManejadorColisiones colisionador;
 
         TgcPickingRay pickingRay;
-        Vector3 collisionPoint;
+        Vector3 selectionPoint;
+        bool applyMovement;
         bool selected;
         TgcMesh selectedMesh;
         Nivel1 nivel;
+        TgcArrow directionArrow;
 
         Camara fpsCamara;
 
@@ -85,6 +87,11 @@ namespace AlumnoEjemplos.MiGrupo
  
             //Iniciarlizar PickingRay
             pickingRay = new TgcPickingRay();
+
+            //Flecha para marcar la dirección
+            directionArrow = new TgcArrow();
+            directionArrow.Thickness = 5;
+            directionArrow.HeadSize = new Vector2(10, 10);
         }
 
 
@@ -104,20 +111,61 @@ namespace AlumnoEjemplos.MiGrupo
                 //Actualizar Ray de colisión en base a posición del mouse
                 pickingRay.updateRay();
 
-
-                //Testear Ray contra el AABB de todos los meshes
+                                //Testear Ray contra el AABB de todos los meshes
                 foreach (TgcMesh objeto in nivel.Seleccionables)
                 {
                     TgcBoundingBox aabb = objeto.BoundingBox;
 
                     //Ejecutar test, si devuelve true se carga el punto de colision collisionPoint
-                    selected = TgcCollisionUtils.intersectRayAABB(pickingRay.Ray, aabb, out collisionPoint);
+                    selected = TgcCollisionUtils.intersectRayAABB(pickingRay.Ray, aabb, out selectionPoint);
 
                     if (selected)
                     {
                         selectedMesh = objeto;
+                        //Fijar nueva posición destino
+                        applyMovement = true;
+
+                        directionArrow.PEnd = new Vector3(selectionPoint.X, selectionPoint.Y, selectionPoint.Z);
+                        
                         break;
                     }
+                }
+            }
+
+            //Interporlar movimiento, si hay que mover
+            if (applyMovement)
+            {
+                //Ver si queda algo de distancia para mover
+                Vector3 posDiff = selectionPoint - selectedMesh.BoundingBox.calculateBoxCenter();
+                float posDiffLength = posDiff.LengthSq();
+                if (posDiffLength > float.Epsilon)
+                {
+                    //Movemos el mesh interpolando por la velocidad
+                    float currentVelocity = 100 * elapsedTime;
+                    posDiff.Normalize();
+                    posDiff.Multiply(currentVelocity);
+
+                    //Ajustar cuando llegamos al final del recorrido
+                    Vector3 newPos = selectedMesh.BoundingBox.calculateBoxCenter() + posDiff;
+                    if (posDiff.LengthSq() > posDiffLength)
+                    {
+                        newPos = selectionPoint;
+                    }
+
+                    //Actualizar flecha de movimiento
+                    directionArrow.PStart = new Vector3(selectedMesh.Position.X, selectedMesh.Position.Y, selectedMesh.Position.Z);
+                    directionArrow.updateValues();
+
+                    //Actualizar posicion del mesh
+                    selectedMesh.Position = newPos;
+
+                    //Como desactivamos la transformacion automatica, tenemos que armar nosotros la matriz de transformacion
+                    selectedMesh.Transform = Matrix.Translation(selectedMesh.Position);
+                }
+                //Se acabo el movimiento
+                else
+                {
+                    applyMovement = false;
                 }
             }
 
