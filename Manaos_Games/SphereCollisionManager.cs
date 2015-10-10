@@ -76,20 +76,15 @@ namespace AlumnoEjemplos.Manaos_Games
             Matrix userMovement = camara.calculateMovement();
 
             //originalSphereCenter = characterSphere.Center;
+            TgcBoundingSphere cameraBoundingBox = new TgcBoundingSphere(camara.getPosition(), 15);
+     
+            //collideWithWorld(cameraBoundingBox, camara.eye, obstaculos);
 
-            //Realizar movimiento
-            //collideWithWorld(characterSphere, movementVector, obstaculos);
-
-            //Aplicar gravedad
-            //if (gravityEnabled)
-            //{
-            //    collideWithWorld(characterSphere, gravityForce, obstaculos);
-            //}
 
             camara.updateViewMatrix(userMovement);
 
             
-        }
+        } 
 
         /// <summary>
         /// Detección de colisiones, filtrando los obstaculos que se encuentran dentro del radio de movimiento
