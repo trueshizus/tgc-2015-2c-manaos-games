@@ -32,7 +32,6 @@ namespace AlumnoEjemplos.MiGrupo
         bool selected;
         TgcMesh selectedMesh;
         Nivel1 nivel;
-        TgcArrow directionArrow;
 
         Camara fpsCamara;
 
@@ -80,18 +79,12 @@ namespace AlumnoEjemplos.MiGrupo
             fpsCamara.RotationSpeed = 2f;
             
             fpsCamara.setCamera(nivel.posicionInicial(), nivel.orientacionCamara());
-            
-            fpsCamara.updateCamera();
+            fpsCamara.updateViewMatrix(d3dDevice);
 
             colisionador = new ManejadorColisiones(fpsCamara, nivel.Obstaculos);
  
             //Iniciarlizar PickingRay
             pickingRay = new TgcPickingRay();
-
-            //Flecha para marcar la dirección
-            directionArrow = new TgcArrow();
-            directionArrow.Thickness = 5;
-            directionArrow.HeadSize = new Vector2(10, 10);
         }
 
 
@@ -111,7 +104,8 @@ namespace AlumnoEjemplos.MiGrupo
                 //Actualizar Ray de colisión en base a posición del mouse
                 pickingRay.updateRay();
 
-                                //Testear Ray contra el AABB de todos los meshes
+
+                //Testear Ray contra el AABB de todos los meshes
                 foreach (TgcMesh objeto in nivel.Seleccionables)
                 {
                     TgcBoundingBox aabb = objeto.BoundingBox;
@@ -125,8 +119,14 @@ namespace AlumnoEjemplos.MiGrupo
                         //Fijar nueva posición destino
                         applyMovement = true;
 
-                        directionArrow.PEnd = new Vector3(selectionPoint.X, selectionPoint.Y, selectionPoint.Z);
-                        
+                        //collisionPointMesh.Position = selectionPoint;
+                        //directionArrow.PEnd = new Vector3(selectionPoint.X, 30f, selectionPoint.Z);
+
+                        ////Rotar modelo en base a la nueva dirección a la que apunta
+                        //Vector3 direction = Vector3.Normalize(newPosition - mesh.Position);
+                        //float angle = FastMath.Acos(Vector3.Dot(originalMeshRot, direction));
+                        //Vector3 axisRotation = Vector3.Cross(originalMeshRot, direction);
+                        //meshRotationMatrix = Matrix.RotationAxis(axisRotation, angle);
                         break;
                     }
                 }
@@ -136,37 +136,40 @@ namespace AlumnoEjemplos.MiGrupo
             if (applyMovement)
             {
                 //Ver si queda algo de distancia para mover
-                Vector3 posDiff = selectionPoint - selectedMesh.BoundingBox.calculateBoxCenter();
-                float posDiffLength = posDiff.LengthSq();
-                if (posDiffLength > float.Epsilon)
-                {
-                    //Movemos el mesh interpolando por la velocidad
-                    float currentVelocity = 100 * elapsedTime;
-                    posDiff.Normalize();
-                    posDiff.Multiply(currentVelocity);
+                //Vector3 posDiff = newPosition - mesh.Position;
+  //              float posDiffLength = posDiff.LengthSq();
+  //              if (posDiffLength > float.Epsilon)
+  //              {
+  //                  //Movemos el mesh interpolando por la velocidad
+  //                //  float currentVelocity = speed * elapsedTime;
+  //                 // posDiff.Normalize();
+  //                 // posDiff.Multiply(currentVelocity);
 
-                    //Ajustar cuando llegamos al final del recorrido
-                    Vector3 newPos = selectedMesh.BoundingBox.calculateBoxCenter() + posDiff;
-                    if (posDiff.LengthSq() > posDiffLength)
-                    {
-                        newPos = selectionPoint;
-                    }
+  //                  //Ajustar cuando llegamos al final del recorrido
+  //                //  Vector3 newPos = mesh.Position + posDiff;
+  //                //  if (posDiff.LengthSq() > posDiffLength)
+  //                //  {
+  //                //      newPos = newPosition;
+  ////                  }
 
-                    //Actualizar flecha de movimiento
-                    directionArrow.PStart = new Vector3(selectedMesh.Position.X, selectedMesh.Position.Y, selectedMesh.Position.Z);
-                    directionArrow.updateValues();
+  //                  //Actualizar flecha de movimiento
+  //  //                directionArrow.PStart = new Vector3(mesh.Position.X, 30f, mesh.Position.Z);
+  //    //              directionArrow.updateValues();
 
-                    //Actualizar posicion del mesh
-                    selectedMesh.Position = newPos;
+  //                  //Actualizar posicion del mesh
+  //                  mesh.Position = newPos;
 
-                    //Como desactivamos la transformacion automatica, tenemos que armar nosotros la matriz de transformacion
-                    selectedMesh.Transform = Matrix.Translation(selectedMesh.Position);
-                }
-                //Se acabo el movimiento
-                else
-                {
-                    applyMovement = false;
-                }
+  //                  //Como desactivamos la transformacion automatica, tenemos que armar nosotros la matriz de transformacion
+  //                  mesh.Transform = meshRotationMatrix * Matrix.Translation(mesh.Position);
+
+  //                  //Actualizar camara
+  //                  GuiController.Instance.ThirdPersonCamera.Target = mesh.Position;
+  //              }
+  //              //Se acabo el movimiento
+  //              else
+  //              {
+  //                  applyMovement = false;
+  //              }
             }
 
             nivel.Render();

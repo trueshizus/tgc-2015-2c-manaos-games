@@ -92,6 +92,9 @@ namespace AlumnoEjemplos.Manaos_Games
             Device device = GuiController.Instance.D3dDevice;
             float elapsedTime = GuiController.Instance.ElapsedTime;
 
+            antCamPos = fpsCamara.getPosition();
+            Vector3 antCamLookAt = fpsCamara.getLookAt();
+
             fpsCamara.updateCamera();
 
             if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.Space))
@@ -105,12 +108,12 @@ namespace AlumnoEjemplos.Manaos_Games
             }
 
             time += elapsedTime;
-            Vector3 camPos = fpsCamara.getPosition();
-            Vector3 camLookAt = fpsCamara.getLookAt();
 
+            Vector3 nueCamPos = fpsCamara.getPosition();
+            
             if (!firstTime)
             {
-                Vector3 lookDir = camLookAt - camPos;
+                //Vector3 lookDir = camLookAt - nueCamPos;
 
                // Vector3 aceleracion = new Vector3(0, -gravedad, 0);
 
@@ -120,11 +123,12 @@ namespace AlumnoEjemplos.Manaos_Games
                 //camPos = camPos + velocidad * elapsedTime;
                 //camPos.Y -= kEpsilon * 1.5f;
 
-                TgcBoundingBox camaraBoundingBox = new TgcBoundingBox(antCamPos, new Vector3(antCamPos.X + 100f, antCamPos.Y + 100f, antCamPos.Z + 100f));
+                TgcBoundingBox camaraBoundingBox = new TgcBoundingBox(new Vector3(nueCamPos.X - 5f, nueCamPos.Y - 150f, nueCamPos.Z - 5f),
+                                                                      new Vector3(nueCamPos.X + 5f, nueCamPos.Y + 100f, nueCamPos.Z + 5f));
 
                 bool collide = false;
 
-                if (antCamPos != camPos)
+                if (antCamPos != nueCamPos)
                 {
                     foreach (TgcBoundingBox obstaculo in obstaculos)
                     {
@@ -140,13 +144,9 @@ namespace AlumnoEjemplos.Manaos_Games
                     if (collide)
                     {
                         //Vector3 retroceso = antCamPos - fpsCamara.getPosition();
-                        fpsCamara.setCamera(antCamPos, camLookAt);
+                        fpsCamara.setCamera(antCamPos, antCamLookAt);
                         
                     }
-                    /*else 
-                    {
-                        fpsCamara.move(camPos - fpsCamara.getPosition());
-                    }*/
                 }
 
                 if (enTierra)
@@ -157,10 +157,12 @@ namespace AlumnoEjemplos.Manaos_Games
 
             }
 
-            antCamPos = camPos;
+            
             firstTime = false;
 
-            return camPos;
+            fpsCamara.updateViewMatrix(device);
+
+            return nueCamPos;
         }
 
         public Vector3 getCurrentPosition()

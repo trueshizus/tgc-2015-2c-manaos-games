@@ -168,14 +168,14 @@ namespace AlumnoEjemplos.Manaos_Games
 
             if(lockCam)
                 Cursor.Position = mouseCenter;
-            
-            viewMatrix = Matrix.LookAtLH(eye, target, up);
-
-            updateViewMatrix(GuiController.Instance.D3dDevice);
         }
 
         public void updateViewMatrix(Microsoft.DirectX.Direct3D.Device d3dDevice)
         {
+            viewMatrix = Matrix.LookAtLH(eye, target, up);
+
+            //updateViewMatrix(GuiController.Instance.D3dDevice);
+
             d3dDevice.Transform.View = viewMatrix;
         }
 
